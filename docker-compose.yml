@@ -1,0 +1,36 @@
+# Runs both microservices together, each in its own container, on a shared
+# private network where they find each other by service name.
+x-healthcheck: &healthcheck
+  test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+  interval: 5s
+  timeout: 3s
+  retries: 5
+
+services:
+  users-service:
+    build: ./users-service
+    ports:
+      - "8001:8000" # your-computer:container
+    environment:
+      DATABASE_URL: sqlite:////data/users.db
+    volumes:
+      - users-data:/data # keeps the database when the container restarts
+    healthcheck: *healthcheck
+
+  orders-service:
+    build: ./orders-service
+    ports:
+      - "8002:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/orders.db
+      USERS_URL: http://users-service:8000
+    volumes:
+      - orders-data:/data
+    healthcheck: *healthcheck
+    depends_on:
+      users-service:
+        condition: service_healthy
+
+volumes:
+  users-data:
+  orders-data:

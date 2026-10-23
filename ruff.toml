@@ -1,0 +1,19 @@
+# Ruff: linter + formatter that enforces PEP 8 and other good practices.
+# This one file applies to every service in the repo.
+target-version = "py312"
+line-length = 88
+
+[lint]
+select = [
+    "E",   # pycodestyle errors (PEP 8)
+    "W",   # pycodestyle warnings (PEP 8)
+    "F",   # pyflakes: unused imports, undefined names
+    "I",   # isort: sorted imports
+    "N",   # pep8-naming: snake_case functions, PascalCase classes
+    "UP",  # pyupgrade: modern Python syntax
+    "B",   # flake8-bugbear: likely bugs
+    "SIM", # flake8-simplify: simpler code
+]
+
+[lint.isort]
+known-first-party = ["app"]
